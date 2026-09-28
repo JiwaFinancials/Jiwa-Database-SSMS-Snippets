@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+</_locDefinition>
+	<CodeSnippet Format="1.0.0">
+	<Header>
+	<Title>Get a Purchase Invoice</Title>
+        <Shortcut></Shortcut>
+	<Description>Retrives the details of a purchase invoice including main record and lines.</Description>
+	<Author>Jiwa Financials</Author>
+	<SnippetTypes>
+		<SnippetType>Expansion</SnippetType>
+	</SnippetTypes>
+	</Header>
+	<Snippet>
+		<Declarations>
+			<Literal>
+				<ID>InvoiceNo</ID>
+				<ToolTip>Invoice no. of the purchase invoice</ToolTip>
+				<Default>2323</Default>
+			</Literal>
+		</Declarations>
+		<Code Language="SQL">
+			<![CDATA[SELECT * 
+FROM PI_Main 
+WHERE PI_Main.InvoiceNo = '$InvoiceNo$'
+GO
+
+SELECT PI_Lines.* 
+FROM PI_Main 
+JOIN PI_Lines ON PI_Main.PI_MainID = PI_Lines.PI_MainID
+WHERE PI_Main.InvoiceNo = '$InvoiceNo$'
+ORDER BY PI_Lines.InvoiceLineNo
+
+SELECT PI_LinesDetails.* 
+FROM PI_Main 
+JOIN PI_Lines ON PI_Main.PI_MainID = PI_Lines.PI_MainID
+JOIN PI_LinesDetails ON PI_Lines.PI_LinesID = PI_LinesDetails.PI_LinesID
+WHERE PI_Main.InvoiceNo = '$InvoiceNo$'
+ORDER BY PI_Lines.InvoiceLineNo
+GO]]>
+		</Code>
+	</Snippet>
+	</CodeSnippet>
+</CodeSnippets>
+

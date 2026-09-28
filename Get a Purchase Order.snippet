@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+</_locDefinition>
+	<CodeSnippet Format="1.0.0">
+	<Header>
+	<Title>Get a Sales Quote</Title>
+        <Shortcut></Shortcut>
+	<Description>Retrives the details of a sales quote including main record, history records, and current history lines.</Description>
+	<Author>Jiwa Financials</Author>
+	<SnippetTypes>
+		<SnippetType>Expansion</SnippetType>
+	</SnippetTypes>
+	</Header>
+	<Snippet>
+		<Declarations>
+			<Literal>
+				<ID>InvoiceNo</ID>
+				<ToolTip>Invoice no. of the sales quote</ToolTip>
+				<Default>100008</Default>
+			</Literal>
+		</Declarations>
+		<Code Language="SQL">
+			<![CDATA[SELECT * 
+FROM QO_Main 
+WHERE QO_Main.InvoiceNo = '$InvoiceNo$'
+GO
+
+SELECT QO_History.* 
+FROM QO_Main 
+JOIN QO_History ON QO_Main.InvoiceID = QO_History.InvoiceID
+WHERE QO_Main.InvoiceNo = '$InvoiceNo$'
+ORDER BY QO_History.HistoryNo
+GO
+
+SELECT QO_Lines.* 
+FROM QO_Main 
+JOIN QO_History ON QO_Main.InvoiceID = QO_History.InvoiceID
+JOIN QO_Lines ON QO_History.InvoiceHistoryID = QO_Lines.InvoiceHistoryID
+WHERE QO_Main.InvoiceNo = '$InvoiceNo$'
+AND QO_History.HistoryNo = QO_Main.CurrentHistoryNo 
+ORDER BY QO_Lines.LineNum
+GO]]>
+		</Code>
+	</Snippet>
+	</CodeSnippet>
+</CodeSnippets>
+

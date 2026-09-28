@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+</_locDefinition>
+	<CodeSnippet Format="1.0.0">
+	<Header>
+	<Title>Get a Service Manager Job</Title>
+        <Shortcut></Shortcut>
+	<Description>Retrives the details of a service manager job including main record, task records, part lines, part lines' details, labour lines, and labour lines' details.</Description>
+	<Author>Jiwa Financials</Author>
+	<SnippetTypes>
+		<SnippetType>Expansion</SnippetType>
+	</SnippetTypes>
+	</Header>
+	<Snippet>
+		<Declarations>
+			<Literal>
+				<ID>JobNo</ID>
+				<ToolTip>Job no. of the service manager job</ToolTip>
+				<Default>0000000002</Default>
+			</Literal>
+		</Declarations>
+		<Code Language="SQL">
+			<![CDATA[SELECT *
+FROM SM_Jobs
+WHERE JobNo = '$JobNo$'
+GO
+
+SELECT SM_Tasks.*
+FROM SM_Jobs
+JOIN SM_Tasks ON SM_Jobs.RecID = SM_Tasks.SM_Jobs_RecID 
+WHERE JobNo = '$JobNo$'
+GO
+
+SELECT SM_Parts.*
+FROM SM_Jobs
+JOIN SM_Tasks ON SM_Jobs.RecID = SM_Tasks.SM_Jobs_RecID 
+JOIN SM_Parts ON SM_Tasks.RecID = SM_Parts.SM_Tasks_RecID 
+WHERE JobNo = '$JobNo$'
+GO
+
+SELECT SM_PartLineDetails.*
+FROM SM_Jobs
+JOIN SM_Tasks ON SM_Jobs.RecID = SM_Tasks.SM_Jobs_RecID 
+JOIN SM_Parts ON SM_Tasks.RecID = SM_Parts.SM_Tasks_RecID 
+JOIN SM_PartLineDetails ON SM_Parts.RecID = SM_PartLineDetails.SM_Parts_RecID
+WHERE JobNo = '$JobNo$'
+GO
+
+SELECT SM_Labour.*
+FROM SM_Jobs
+JOIN SM_Tasks ON SM_Jobs.RecID = SM_Tasks.SM_Jobs_RecID 
+JOIN SM_Labour ON SM_Tasks.RecID = SM_Labour.SM_Tasks_RecID 
+WHERE JobNo = '$JobNo$'
+GO
+
+SELECT SM_LabourLineDetails.*
+FROM SM_Jobs
+JOIN SM_Tasks ON SM_Jobs.RecID = SM_Tasks.SM_Jobs_RecID 
+JOIN SM_Labour ON SM_Tasks.RecID = SM_Labour.SM_Tasks_RecID 
+JOIN SM_LabourLineDetails ON SM_Labour.RecID = SM_LabourLineDetails.SM_Labour_RecID 
+WHERE JobNo = '$JobNo$'
+GO]]>
+		</Code>
+	</Snippet>
+	</CodeSnippet>
+</CodeSnippets>
+

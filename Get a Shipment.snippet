@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+</_locDefinition>
+	<CodeSnippet Format="1.0.0">
+	<Header>
+	<Title>Get a Shipment</Title>
+        <Shortcut></Shortcut>
+	<Description>Retrives the details of a landed cost shipment including main record, purchase orders, import costs, lines, stock booked in, invoices, and value of taxable import entries.</Description>
+	<Author>Jiwa Financials</Author>
+	<SnippetTypes>
+		<SnippetType>Expansion</SnippetType>
+	</SnippetTypes>
+	</Header>
+	<Snippet>
+		<Declarations>
+			<Literal>
+				<ID>ShipmentNo</ID>
+				<ToolTip>Shipment no. of the landed cost shipment</ToolTip>
+				<Default>00008</Default>
+			</Literal>
+		</Declarations>
+		<Code Language="SQL">
+			<![CDATA[SELECT *
+FROM SH_Main
+WHERE SH_Main.ShipmentNo = '00008'
+GO
+
+SELECT SH_PurchaseOrders.*
+FROM SH_Main
+JOIN SH_PurchaseOrders ON SH_Main.ShipmentID = SH_PurchaseOrders.SH_Main_RecID
+WHERE SH_Main.ShipmentNo = '$ShipmentNo$'
+GO
+
+SELECT SH_Costs.*
+FROM SH_Main
+JOIN SH_Costs ON SH_Main.ShipmentID = SH_Costs.ShipmentID 
+WHERE SH_Main.ShipmentNo = '$ShipmentNo$'
+GO
+
+SELECT SH_Lines.*
+FROM SH_Main
+JOIN SH_Lines ON SH_Main.ShipmentID = SH_Lines.ShipmentID 
+WHERE SH_Main.ShipmentNo = '$ShipmentNo$'
+GO
+
+SELECT  SH_BookInDetailLines.RecID, SH_BookInDetailLines.Quantity, SH_BookInDetailLines.SerialNo, IN_SOH.IN_BinLocationLookup_INBinLookupID, IN_BinLocationLookup.Description IN_BinLocationLookup_Description, SH_BookInDetailLines.Cost, SH_BookInDetailLines.IN_SOH_LinkID, SH_BookInDetailLines.ExpiryDate, SH_BookInDetailLines.SpecialPrice, SH_BookInDetailLines.LastSavedDateTime, SH_BookInDetailLines.RowHash, SH_BookInDetailLines.Parent_RecID
+FROM SH_Main
+JOIN SH_Lines ON SH_Main.ShipmentID = SH_Lines.ShipmentID 
+JOIN SH_BookInLines ON SH_Lines.ShipmentLineID = SH_BookInLines.ShipmentLineID 
+JOIN SH_BookInDetailLines ON SH_BookInDetailLines.Parent_RecID = SH_BookInLines.BookInLineID 
+JOIN IN_SOH ON IN_SOH.LinkID = SH_BookInDetailLines.IN_SOH_LinkID 
+JOIN IN_BinLocationLookup ON IN_BinLocationLookup.INBinLookupID = IN_SOH.IN_BinLocationLookup_INBinLookupID 
+WHERE SH_Main.ShipmentNo = '$ShipmentNo$'
+GO
+
+SELECT SH_Invoices.*
+FROM SH_Main
+JOIN SH_Invoices ON SH_Main.ShipmentID = SH_Invoices.ShipmentID 
+WHERE SH_Main.ShipmentNo = '$ShipmentNo$'
+GO
+
+SELECT SH_Voti.*
+FROM SH_Main
+JOIN SH_Voti ON SH_Main.ShipmentID = SH_Voti.ShipmentID 
+WHERE SH_Main.ShipmentNo = '$ShipmentNo$'
+GO]]>
+		</Code>
+	</Snippet>
+	</CodeSnippet>
+</CodeSnippets>
+

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+</_locDefinition>
+	<CodeSnippet Format="1.0.0">
+	<Header>
+	<Title>Get a Purchase Order</Title>
+        <Shortcut></Shortcut>
+	<Description>Retrives the details of a purchase order including main record and lines.</Description>
+	<Author>Jiwa Financials</Author>
+	<SnippetTypes>
+		<SnippetType>Expansion</SnippetType>
+	</SnippetTypes>
+	</Header>
+	<Snippet>
+		<Declarations>
+			<Literal>
+				<ID>OrderNo</ID>
+				<ToolTip>Order no. of the purchase order</ToolTip>
+				<Default>100001</Default>
+			</Literal>
+		</Declarations>
+		<Code Language="SQL">
+			<![CDATA[SELECT * 
+FROM PO_Main 
+WHERE PO_Main.OrderNo = '$OrderNo$'
+GO
+
+SELECT PO_Lines.* 
+FROM PO_Main 
+JOIN PO_Lines ON PO_Main.OrderID = PO_Lines.OrderID
+WHERE PO_Main.OrderNo = '$OrderNo$'
+ORDER BY PO_Lines.OrderLineNo
+GO]]>
+		</Code>
+	</Snippet>
+	</CodeSnippet>
+</CodeSnippets>
+

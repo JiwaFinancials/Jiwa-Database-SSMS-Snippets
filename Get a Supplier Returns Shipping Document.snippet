@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+</_locDefinition>
+	<CodeSnippet Format="1.0.0">
+	<Header>
+	<Title>Get a Suplier Returns Shipping Document</Title>
+        <Shortcut></Shortcut>
+	<Description>Retrives the details of a supplier returns shipping document including main record, and lines.</Description>
+	<Author>Jiwa Financials</Author>
+	<SnippetTypes>
+		<SnippetType>Expansion</SnippetType>
+	</SnippetTypes>
+	</Header>
+	<Snippet>
+		<Declarations>
+			<Literal>
+				<ID>ShippingNo</ID>
+				<ToolTip>Shipping no. of the supplier return shipping document.</ToolTip>
+				<Default>002</Default>
+			</Literal>
+		</Declarations>
+		<Code Language="SQL">
+			<![CDATA[SELECT *
+FROM RA_ShipMain 
+WHERE RA_ShipMain.ShippingNo = '$ShippingNo$'
+GO
+
+SELECT RA_ShipLines.*
+FROM RA_ShipMain
+JOIN RA_ShipLines ON RA_ShipMain.RecID = RA_ShipLines.RA_ShipMain_RecID 
+WHERE RA_ShipMain.ShippingNo = '$ShippingNo$'
+GO]]>
+		</Code>
+	</Snippet>
+	</CodeSnippet>
+</CodeSnippets>
+

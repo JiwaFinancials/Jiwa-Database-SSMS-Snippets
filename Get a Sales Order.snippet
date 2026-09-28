@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+</_locDefinition>
+	<CodeSnippet Format="1.0.0">
+	<Header>
+	<Title>Get a Sales Order</Title>
+        <Shortcut></Shortcut>
+	<Description>Retrieves the details of a sales order including main record, history records, current history lines, and currenct history lines' details.</Description>
+	<Author>Jiwa Financials</Author>
+	<SnippetTypes>
+		<SnippetType>Expansion</SnippetType>
+	</SnippetTypes>
+	</Header>
+	<Snippet>
+		<Declarations>
+			<Literal>
+				<ID>InvoiceNo</ID>
+				<ToolTip>Invoice no. of the sales order</ToolTip>
+				<Default>100495</Default>
+			</Literal>
+		</Declarations>
+		<Code Language="SQL">
+			<![CDATA[SELECT * 
+FROM SO_Main 
+WHERE SO_Main.InvoiceNo = '$InvoiceNo$'
+GO
+
+SELECT SO_History.* 
+FROM SO_Main 
+JOIN SO_History ON SO_Main.InvoiceID = SO_History.InvoiceID
+WHERE SO_Main.InvoiceNo = '$InvoiceNo$'
+ORDER BY SO_History.HistoryNo
+GO
+
+SELECT SO_Lines.* 
+FROM SO_Main 
+JOIN SO_History ON SO_Main.InvoiceID = SO_History.InvoiceID
+JOIN SO_Lines ON SO_History.InvoiceHistoryID = SO_Lines.InvoiceHistoryID
+WHERE SO_Main.InvoiceNo = '$InvoiceNo$'
+AND SO_History.HistoryNo = SO_Main.CurrentHistoryNo 
+ORDER BY SO_Lines.LineNum
+GO
+
+SELECT SO_LineDetails.* 
+FROM SO_Main 
+JOIN SO_History ON SO_Main.InvoiceID = SO_History.InvoiceID
+JOIN SO_Lines ON SO_History.InvoiceHistoryID = SO_Lines.InvoiceHistoryID
+JOIN SO_LineDetails ON SO_Lines.InvoiceLineID = SO_LineDetails.InvoiceLineID
+WHERE SO_Main.InvoiceNo = '$InvoiceNo$'
+AND SO_History.HistoryNo = SO_Main.CurrentHistoryNo 
+ORDER BY SO_Lines.LineNum
+GO
+
+SELECT SO_EDIMain.* 
+FROM SO_Main 
+JOIN SO_EDIMain ON SO_Main.InvoiceID = SO_EDIMain.InvoiceID
+WHERE SO_Main.InvoiceNo = '$InvoiceNo$'
+GO]]>
+		</Code>
+	</Snippet>
+	</CodeSnippet>
+</CodeSnippets>
+

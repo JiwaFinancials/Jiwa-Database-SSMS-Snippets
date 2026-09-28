@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+</_locDefinition>
+	<CodeSnippet Format="1.0.0">
+	<Header>
+	<Title>Get a Bank Receipt</Title>
+        <Shortcut></Shortcut>
+	<Description>Retrieves the details of a bank receipt including main record, transaction lines, and allocation details.</Description>
+	<Author>Jiwa Financials</Author>
+	<SnippetTypes>
+		<SnippetType>Expansion</SnippetType>
+	</SnippetTypes>
+	</Header>
+	<Snippet>
+		<Declarations>
+			<Literal>
+				<ID>BankReceiptNo</ID>
+				<ToolTip>Bank receipt no. of the bank receipt batch.</ToolTip>
+				<Default>00000044</Default>
+			</Literal>
+		</Declarations>
+		<Code Language="SQL">
+			<![CDATA[SELECT * 
+FROM BA_BankReceipt 
+WHERE BA_BankReceipt.BankReceiptNo = '$BankReceiptNo$'
+GO
+
+SELECT BA_BankReceiptLine.* 
+FROM BA_BankReceipt 
+JOIN BA_BankReceiptLine ON BA_BankReceipt.RecID = BA_BankReceiptLine.BA_BankReceipt_RecID
+WHERE BA_BankReceipt.BankReceiptNo = '$BankReceiptNo$'
+ORDER BY BA_BankReceiptLine.ItemNo
+GO
+
+SELECT
+    'Debtor' AS LineType,
+    BA_BankReceiptLine.ItemNo,
+    BA_BankReceiptLineDebtor.RecID AS DetailRecID,
+    BA_BankReceiptLineDebtor.BA_BankReceiptLine_RecID AS Detail_BA_BankReceiptLine_RecID,
+    BA_BankReceiptLineDebtor.Amount AS DetailAmount,
+    BA_BankReceiptLineDebtor.FXAmount AS DetailFXAmount,
+    BA_BankReceiptLineDebtor.Reference AS DetailReference,
+    BA_BankReceiptLineDebtor.Remark AS DetailRemark,
+    BA_BankReceiptLineDebtor.ItemNo AS DetailItemNo,
+    BA_BankReceiptLineDebtor.Legacy_CBBatchTranLineID AS DetailLegacy_CBBatchTranLineID,
+    BA_BankReceiptLineDebtor.DB_Main_DebtorID AS DB_Main_DebtorID,
+    BA_BankReceiptLineDebtor.DiscountAmount AS DiscountAmount,
+    BA_BankReceiptLineDebtor.FXDiscountAmount AS FXDiscountAmount,
+    BA_BankReceiptLineDebtor.Discount_GL_Ledger_GLLedgerID AS Discount_GL_Ledger_GLLedgerID,
+    BA_BankReceiptLineDebtor.Discount_TX_Main_TaxID AS Discount_TX_Main_TaxID,
+    BA_BankReceiptLineDebtor.DiscountTaxAmount AS DiscountTaxAmount,
+    BA_BankReceiptLineDebtor.FXDiscountTaxAmount AS FXDiscountTaxAmount,
+    CAST(NULL AS char(20)) AS CR_Main_CreditorID,
+    CAST(NULL AS char(20)) AS GL_Ledger_GLLedgerID,
+    CAST(NULL AS char(20)) AS TX_Main_TaxID,
+    CAST(NULL AS decimal(19,6)) AS TaxAmount,
+    CAST(NULL AS decimal(19,6)) AS FXTaxAmount,
+    CAST(NULL AS char(20)) AS Legacy_GL_Transactions_GLTransactionID
+FROM BA_BankReceipt
+JOIN BA_BankReceiptLine ON BA_BankReceipt.RecID = BA_BankReceiptLine.BA_BankReceipt_RecID
+JOIN BA_BankReceiptLineDebtor ON BA_BankReceiptLine.RecID = BA_BankReceiptLineDebtor.BA_BankReceiptLine_RecID
+WHERE BA_BankReceipt.BankReceiptNo = '$BankReceiptNo$'
+
+UNION ALL
+
+SELECT
+    'Creditor' AS LineType,
+    BA_BankReceiptLine.ItemNo,
+    BA_BankReceiptLineCreditor.RecID AS DetailRecID,
+    BA_BankReceiptLineCreditor.BA_BankReceiptLine_RecID AS Detail_BA_BankReceiptLine_RecID,
+    BA_BankReceiptLineCreditor.Amount AS DetailAmount,
+    BA_BankReceiptLineCreditor.FXAmount AS DetailFXAmount,
+    BA_BankReceiptLineCreditor.Reference AS DetailReference,
+    BA_BankReceiptLineCreditor.Remark AS DetailRemark,
+    BA_BankReceiptLineCreditor.ItemNo AS DetailItemNo,
+    BA_BankReceiptLineCreditor.Legacy_CBBatchTranLineID AS DetailLegacy_CBBatchTranLineID,
+    CAST(NULL AS char(20)) AS DB_Main_DebtorID,
+    CAST(NULL AS decimal(19,6)) AS DiscountAmount,
+    CAST(NULL AS decimal(19,6)) AS FXDiscountAmount,
+    CAST(NULL AS char(20)) AS Discount_GL_Ledger_GLLedgerID,
+    CAST(NULL AS char(20)) AS Discount_TX_Main_TaxID,
+    CAST(NULL AS decimal(19,6)) AS DiscountTaxAmount,
+    CAST(NULL AS decimal(19,6)) AS FXDiscountTaxAmount,
+    BA_BankReceiptLineCreditor.CR_Main_CreditorID AS CR_Main_CreditorID,
+    CAST(NULL AS char(20)) AS GL_Ledger_GLLedgerID,
+    CAST(NULL AS char(20)) AS TX_Main_TaxID,
+    CAST(NULL AS decimal(19,6)) AS TaxAmount,
+    CAST(NULL AS decimal(19,6)) AS FXTaxAmount,
+    CAST(NULL AS char(20)) AS Legacy_GL_Transactions_GLTransactionID
+FROM BA_BankReceipt
+JOIN BA_BankReceiptLine ON BA_BankReceipt.RecID = BA_BankReceiptLine.BA_BankReceipt_RecID
+JOIN BA_BankReceiptLineCreditor ON BA_BankReceiptLine.RecID = BA_BankReceiptLineCreditor.BA_BankReceiptLine_RecID
+WHERE BA_BankReceipt.BankReceiptNo = '$BankReceiptNo$'
+
+UNION ALL
+
+SELECT
+    'Other' AS LineType,
+    BA_BankReceiptLine.ItemNo,
+    BA_BankReceiptLineOther.RecID AS DetailRecID,
+    BA_BankReceiptLineOther.BA_BankReceiptLine_RecID AS Detail_BA_BankReceiptLine_RecID,
+    BA_BankReceiptLineOther.Amount AS DetailAmount,
+    BA_BankReceiptLineOther.FXAmount AS DetailFXAmount,
+    BA_BankReceiptLineOther.Reference AS DetailReference,
+    BA_BankReceiptLineOther.Remark AS DetailRemark,
+    BA_BankReceiptLineOther.ItemNo AS DetailItemNo,
+    BA_BankReceiptLineOther.Legacy_CBBatchTranLineID AS DetailLegacy_CBBatchTranLineID,
+    CAST(NULL AS char(20)) AS DB_Main_DebtorID,
+    CAST(NULL AS decimal(19,6)) AS DiscountAmount,
+    CAST(NULL AS decimal(19,6)) AS FXDiscountAmount,
+    CAST(NULL AS char(20)) AS Discount_GL_Ledger_GLLedgerID,
+    CAST(NULL AS char(20)) AS Discount_TX_Main_TaxID,
+    CAST(NULL AS decimal(19,6)) AS DiscountTaxAmount,
+    CAST(NULL AS decimal(19,6)) AS FXDiscountTaxAmount,
+    CAST(NULL AS char(20)) AS CR_Main_CreditorID,
+    BA_BankReceiptLineOther.GL_Ledger_GLLedgerID AS GL_Ledger_GLLedgerID,
+    BA_BankReceiptLineOther.TX_Main_TaxID AS TX_Main_TaxID,
+    BA_BankReceiptLineOther.TaxAmount AS TaxAmount,
+    BA_BankReceiptLineOther.FXTaxAmount AS FXTaxAmount,
+    BA_BankReceiptLineOther.Legacy_GL_Transactions_GLTransactionID AS Legacy_GL_Transactions_GLTransactionID
+FROM BA_BankReceipt
+JOIN BA_BankReceiptLine ON BA_BankReceipt.RecID = BA_BankReceiptLine.BA_BankReceipt_RecID
+JOIN BA_BankReceiptLineOther ON BA_BankReceiptLine.RecID = BA_BankReceiptLineOther.BA_BankReceiptLine_RecID
+WHERE BA_BankReceipt.BankReceiptNo = '$BankReceiptNo$'
+
+ORDER BY BA_BankReceiptLine.ItemNo
+GO
+
+SELECT
+    'Debtor' AS LineType,
+    BA_BankReceiptLine.ItemNo,
+    BA_BankReceiptLineDebtor.RecID AS DetailRecID,
+    BA_BankReceiptLineDebtor.BA_BankReceiptLine_RecID AS Detail_BA_BankReceiptLine_RecID,
+    BA_BankReceiptLineDebtor.Amount AS DetailAmount,
+    BA_BankReceiptLineDebtor.FXAmount AS DetailFXAmount,
+    BA_BankReceiptLineDebtor.DB_Main_DebtorID AS DB_Main_DebtorID,
+    BA_BankReceiptLineDebtor.DiscountAmount AS DiscountAmount,
+    BA_BankReceiptLineDebtor.FXDiscountAmount AS FXDiscountAmount,
+    BA_BankReceiptLineDebtor.Discount_GL_Ledger_GLLedgerID AS Discount_GL_Ledger_GLLedgerID,
+    BA_BankReceiptLineDebtor.Discount_TX_Main_TaxID AS Discount_TX_Main_TaxID,
+    BA_BankReceiptLineDebtor.DiscountTaxAmount AS DiscountTaxAmount,
+    BA_BankReceiptLineDebtor.FXDiscountTaxAmount AS FXDiscountTaxAmount,
+    BA_BankReceiptLineDebtor.Reference AS DetailReference,
+    BA_BankReceiptLineDebtor.Remark AS DetailRemark,
+    BA_BankReceiptLineDebtor.ItemNo AS DetailItemNo,
+    BA_BankReceiptLineDebtor.Legacy_CBBatchTranLineID AS DetailLegacy_CBBatchTranLineID,
+    CAST(NULL AS char(20)) AS CR_Main_CreditorID,
+    BA_BankReceiptLineDebtorAllocation.RecID AS AllocationRecID,
+    BA_BankReceiptLineDebtorAllocation.BA_BankReceiptLineDebtor_RecID AS AllocationParentRecID,
+    BA_BankReceiptLineDebtorAllocation.DB_Trans_TransID AS AllocationTransID,
+    BA_BankReceiptLineDebtorAllocation.AllocationType AS AllocationType,
+    BA_BankReceiptLineDebtorAllocation.BankReceiptLineAllocationAmount AS BankReceiptLineAllocationAmount,
+    BA_BankReceiptLineDebtorAllocation.DebtorTransactionAllocationAmount AS DebtorTransactionAllocationAmount,
+    CAST(NULL AS decimal(19,6)) AS CreditorTransactionAllocationAmount
+FROM BA_BankReceipt
+JOIN BA_BankReceiptLine ON BA_BankReceipt.RecID = BA_BankReceiptLine.BA_BankReceipt_RecID
+JOIN BA_BankReceiptLineDebtor ON BA_BankReceiptLine.RecID = BA_BankReceiptLineDebtor.BA_BankReceiptLine_RecID
+JOIN BA_BankReceiptLineDebtorAllocation ON BA_BankReceiptLineDebtor.RecID = BA_BankReceiptLineDebtorAllocation.BA_BankReceiptLineDebtor_RecID
+WHERE BA_BankReceipt.BankReceiptNo = '$BankReceiptNo$'
+
+UNION ALL
+
+SELECT
+    'Creditor' AS LineType,
+    BA_BankReceiptLine.ItemNo,
+    BA_BankReceiptLineCreditor.RecID AS DetailRecID,
+    BA_BankReceiptLineCreditor.BA_BankReceiptLine_RecID AS Detail_BA_BankReceiptLine_RecID,
+    BA_BankReceiptLineCreditor.Amount AS DetailAmount,
+    BA_BankReceiptLineCreditor.FXAmount AS DetailFXAmount,
+    CAST(NULL AS char(20)) AS DB_Main_DebtorID,
+    CAST(NULL AS decimal(19,6)) AS DiscountAmount,
+    CAST(NULL AS decimal(19,6)) AS FXDiscountAmount,
+    CAST(NULL AS char(20)) AS Discount_GL_Ledger_GLLedgerID,
+    CAST(NULL AS char(20)) AS Discount_TX_Main_TaxID,
+    CAST(NULL AS decimal(19,6)) AS DiscountTaxAmount,
+    CAST(NULL AS decimal(19,6)) AS FXDiscountTaxAmount,
+    BA_BankReceiptLineCreditor.Reference AS DetailReference,
+    BA_BankReceiptLineCreditor.Remark AS DetailRemark,
+    BA_BankReceiptLineCreditor.ItemNo AS DetailItemNo,
+    BA_BankReceiptLineCreditor.Legacy_CBBatchTranLineID AS DetailLegacy_CBBatchTranLineID,
+    BA_BankReceiptLineCreditor.CR_Main_CreditorID AS CR_Main_CreditorID,
+    BA_BankReceiptLineCreditorAllocation.RecID AS AllocationRecID,
+    BA_BankReceiptLineCreditorAllocation.BA_BankReceiptLineCreditor_RecID AS AllocationParentRecID,
+    BA_BankReceiptLineCreditorAllocation.CR_Trans_TransID AS AllocationTransID,
+    CAST(NULL AS bit) AS AllocationType,
+    BA_BankReceiptLineCreditorAllocation.BankReceiptLineAllocationAmount AS BankReceiptLineAllocationAmount,
+    CAST(NULL AS decimal(19,6)) AS DebtorTransactionAllocationAmount,
+    BA_BankReceiptLineCreditorAllocation.CreditorTransactionAllocationAmount AS CreditorTransactionAllocationAmount
+FROM BA_BankReceipt
+JOIN BA_BankReceiptLine ON BA_BankReceipt.RecID = BA_BankReceiptLine.BA_BankReceipt_RecID
+JOIN BA_BankReceiptLineCreditor ON BA_BankReceiptLine.RecID = BA_BankReceiptLineCreditor.BA_BankReceiptLine_RecID
+JOIN BA_BankReceiptLineCreditorAllocation ON BA_BankReceiptLineCreditor.RecID = BA_BankReceiptLineCreditorAllocation.BA_BankReceiptLineCreditor_RecID
+WHERE BA_BankReceipt.BankReceiptNo = '$BankReceiptNo$'
+
+ORDER BY ItemNo, LineType, AllocationRecID
+GO
+]]>
+		</Code>
+	</Snippet>
+	</CodeSnippet>
+</CodeSnippets>
+

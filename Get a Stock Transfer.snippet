@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+</_locDefinition>
+	<CodeSnippet Format="1.0.0">
+	<Header>
+	<Title>Get a Stock Transfer</Title>
+        <Shortcut></Shortcut>
+	<Description>Retrives the details of a stock transfer including main record and lines.</Description>
+	<Author>Jiwa Financials</Author>
+	<SnippetTypes>
+		<SnippetType>Expansion</SnippetType>
+	</SnippetTypes>
+	</Header>
+	<Snippet>
+		<Declarations>
+			<Literal>
+				<ID>TransferNo</ID>
+				<ToolTip>Transfer no. of the sales quote</ToolTip>
+				<Default>0000000019</Default>
+			</Literal>
+		</Declarations>
+		<Code Language="SQL">
+			<![CDATA[SELECT *
+FROM IN_Transfer 
+WHERE TransferNo = '$TransferNo$'
+GO
+
+SELECT *
+FROM IN_TransferLines 
+WHERE IN_TransferLines.TransferID = (SELECT TransferID FROM IN_Transfer WHERE TransferNo = '$TransferNo$')
+GO]]>
+		</Code>
+	</Snippet>
+	</CodeSnippet>
+</CodeSnippets>
+
