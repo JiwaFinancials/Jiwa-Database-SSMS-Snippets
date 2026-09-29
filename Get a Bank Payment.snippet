@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+</_locDefinition>
+	<CodeSnippet Format="1.0.0">
+	<Header>
+	<Title>Get a Bank Payment</Title>
+        <Shortcut></Shortcut>
+	<Description>Retrieves the details of a bank payment including main record, transaction lines, and allocation details.</Description>
+	<Author>Jiwa Financials</Author>
+	<SnippetTypes>
+		<SnippetType>Expansion</SnippetType>
+	</SnippetTypes>
+	</Header>
+	<Snippet>
+		<Declarations>
+			<Literal>
+				<ID>BankPaymentNo</ID>
+				<ToolTip>Bank payment no. of the bank payment batch.</ToolTip>
+				<Default>00000044</Default>
+			</Literal>
+		</Declarations>
+		<Code Language="SQL">
+			<![CDATA[SELECT * 
+FROM BA_BankPayment 
+WHERE BA_BankPayment.BankPaymentNo = '$BankPaymentNo$'
+GO
+
+SELECT BA_BankPaymentLine.* 
+FROM BA_BankPayment 
+JOIN BA_BankPaymentLine ON BA_BankPayment.RecID = BA_BankPaymentLine.BA_BankPayment_RecID
+WHERE BA_BankPayment.BankPaymentNo = '$BankPaymentNo$'
+ORDER BY BA_BankPaymentLine.ItemNo
+GO
+
+SELECT
+    'Debtor' AS LineType,
+    BA_BankPaymentLine.ItemNo,
+    BA_BankPaymentLineDebtor.RecID AS DetailRecID,
+    BA_BankPaymentLineDebtor.BA_BankPaymentLine_RecID AS Detail_BA_BankPaymentLine_RecID,
+    BA_BankPaymentLineDebtor.Amount AS DetailAmount,
+    BA_BankPaymentLineDebtor.FXAmount AS DetailFXAmount,
+    BA_BankPaymentLineDebtor.Reference AS DetailReference,
+    BA_BankPaymentLineDebtor.Remark AS DetailRemark,
+    BA_BankPaymentLineDebtor.ItemNo AS DetailItemNo,
+    BA_BankPaymentLineDebtor.Legacy_CBBatchTranLineID AS DetailLegacy_CBBatchTranLineID,
+    BA_BankPaymentLineDebtor.DB_Main_DebtorID AS DB_Main_DebtorID,
+    CAST(NULL AS DECIMAL(19,6)) AS DiscountAmount,
+    CAST(NULL AS DECIMAL(19,6)) AS FXDiscountAmount,
+    CAST(NULL AS CHAR(20)) AS Discount_GL_Ledger_GLLedgerID,
+    CAST(NULL AS CHAR(20)) AS Discount_TX_Main_TaxID,
+    CAST(NULL AS DECIMAL(19,6)) AS DiscountTaxAmount,
+    CAST(NULL AS DECIMAL(19,6)) AS FXDiscountTaxAmount,
+    CAST(NULL AS CHAR(20)) AS CR_Main_CreditorID,
+    CAST(NULL AS CHAR(20)) AS GL_Ledger_GLLedgerID,
+    CAST(NULL AS CHAR(20)) AS TX_Main_TaxID,
+    CAST(NULL AS DECIMAL(19,6)) AS TaxAmount,
+    CAST(NULL AS DECIMAL(19,6)) AS FXTaxAmount,
+    CAST(NULL AS CHAR(20)) AS Legacy_GL_Transactions_GLTransactionID,
+    CAST(NULL AS UNIQUEIDENTIFIER) AS BA_BankAccount_RecID
+FROM BA_BankPayment
+JOIN BA_BankPaymentLine ON BA_BankPayment.RecID = BA_BankPaymentLine.BA_BankPayment_RecID
+JOIN BA_BankPaymentLineDebtor ON BA_BankPaymentLine.RecID = BA_BankPaymentLineDebtor.BA_BankPaymentLine_RecID
+WHERE BA_BankPayment.BankPaymentNo = '$BankPaymentNo$'
+
+UNION ALL
+
+SELECT
+    'Creditor' AS LineType,
+    BA_BankPaymentLine.ItemNo,
+    BA_BankPaymentLineCreditor.RecID AS DetailRecID,
+    BA_BankPaymentLineCreditor.BA_BankPaymentLine_RecID AS Detail_BA_BankPaymentLine_RecID,
+    BA_BankPaymentLineCreditor.Amount AS DetailAmount,
+    BA_BankPaymentLineCreditor.FXAmount AS DetailFXAmount,
+    BA_BankPaymentLineCreditor.Reference AS DetailReference,
+    BA_BankPaymentLineCreditor.Remark AS DetailRemark,
+    BA_BankPaymentLineCreditor.ItemNo AS DetailItemNo,
+    BA_BankPaymentLineCreditor.Legacy_CBBatchTranLineID AS DetailLegacy_CBBatchTranLineID,
+    CAST(NULL AS CHAR(20)) AS DB_Main_DebtorID,
+    BA_BankPaymentLineCreditor.DiscountAmount AS DiscountAmount,
+    BA_BankPaymentLineCreditor.FXDiscountAmount AS FXDiscountAmount,
+    BA_BankPaymentLineCreditor.Discount_GL_Ledger_GLLedgerID AS Discount_GL_Ledger_GLLedgerID,
+    BA_BankPaymentLineCreditor.Discount_TX_Main_TaxID AS Discount_TX_Main_TaxID,
+    BA_BankPaymentLineCreditor.DiscountTaxAmount AS DiscountTaxAmount,
+    BA_BankPaymentLineCreditor.FXDiscountTaxAmount AS FXDiscountTaxAmount,
+    BA_BankPaymentLineCreditor.CR_Main_CreditorID AS CR_Main_CreditorID,
+    CAST(NULL AS CHAR(20)) AS GL_Ledger_GLLedgerID,
+    CAST(NULL AS CHAR(20)) AS TX_Main_TaxID,
+    CAST(NULL AS DECIMAL(19,6)) AS TaxAmount,
+    CAST(NULL AS DECIMAL(19,6)) AS FXTaxAmount,
+    CAST(NULL AS CHAR(20)) AS Legacy_GL_Transactions_GLTransactionID,
+    CAST(NULL AS UNIQUEIDENTIFIER) AS BA_BankAccount_RecID
+FROM BA_BankPayment
+JOIN BA_BankPaymentLine ON BA_BankPayment.RecID = BA_BankPaymentLine.BA_BankPayment_RecID
+JOIN BA_BankPaymentLineCreditor ON BA_BankPaymentLine.RecID = BA_BankPaymentLineCreditor.BA_BankPaymentLine_RecID
+WHERE BA_BankPayment.BankPaymentNo = '$BankPaymentNo$'
+
+UNION ALL
+
+SELECT
+    'Other' AS LineType,
+    BA_BankPaymentLine.ItemNo,
+    BA_BankPaymentLineOther.RecID AS DetailRecID,
+    BA_BankPaymentLineOther.BA_BankPaymentLine_RecID AS Detail_BA_BankPaymentLine_RecID,
+    BA_BankPaymentLineOther.Amount AS DetailAmount,
+    BA_BankPaymentLineOther.FXAmount AS DetailFXAmount,
+    BA_BankPaymentLineOther.Reference AS DetailReference,
+    BA_BankPaymentLineOther.Remark AS DetailRemark,
+    BA_BankPaymentLineOther.ItemNo AS DetailItemNo,
+    BA_BankPaymentLineOther.Legacy_CBBatchTranLineID AS DetailLegacy_CBBatchTranLineID,
+    CAST(NULL AS CHAR(20)) AS DB_Main_DebtorID,
+    CAST(NULL AS DECIMAL(19,6)) AS DiscountAmount,
+    CAST(NULL AS DECIMAL(19,6)) AS FXDiscountAmount,
+    CAST(NULL AS CHAR(20)) AS Discount_GL_Ledger_GLLedgerID,
+    CAST(NULL AS CHAR(20)) AS Discount_TX_Main_TaxID,
+    CAST(NULL AS DECIMAL(19,6)) AS DiscountTaxAmount,
+    CAST(NULL AS DECIMAL(19,6)) AS FXDiscountTaxAmount,
+    CAST(NULL AS CHAR(20)) AS CR_Main_CreditorID,
+    BA_BankPaymentLineOther.GL_Ledger_GLLedgerID AS GL_Ledger_GLLedgerID,
+    BA_BankPaymentLineOther.TX_Main_TaxID AS TX_Main_TaxID,
+    BA_BankPaymentLineOther.TaxAmount AS TaxAmount,
+    BA_BankPaymentLineOther.FXTaxAmount AS FXTaxAmount,
+    BA_BankPaymentLineOther.Legacy_GL_Transactions_GLTransactionID AS Legacy_GL_Transactions_GLTransactionID,
+    CAST(NULL AS UNIQUEIDENTIFIER) AS BA_BankAccount_RecID
+FROM BA_BankPayment
+JOIN BA_BankPaymentLine ON BA_BankPayment.RecID = BA_BankPaymentLine.BA_BankPayment_RecID
+JOIN BA_BankPaymentLineOther ON BA_BankPaymentLine.RecID = BA_BankPaymentLineOther.BA_BankPaymentLine_RecID
+WHERE BA_BankPayment.BankPaymentNo = '$BankPaymentNo$'
+
+UNION ALL
+
+SELECT
+    'Bank Transfer' AS LineType,
+    BA_BankPaymentLine.ItemNo,
+    BA_BankPaymentLineBankTransfer.RecID AS DetailRecID,
+    BA_BankPaymentLineBankTransfer.BA_BankPaymentLine_RecID AS Detail_BA_BankPaymentLine_RecID,
+    BA_BankPaymentLine.Amount AS DetailAmount,
+    BA_BankPaymentLine.FXAmount AS DetailFXAmount,
+    BA_BankPaymentLine.Reference AS DetailReference,
+    BA_BankPaymentLine.Remark AS DetailRemark,
+    BA_BankPaymentLine.ItemNo AS DetailItemNo,
+    NULL AS DetailLegacy_CBBatchTranLineID,
+    CAST(NULL AS CHAR(20)) AS DB_Main_DebtorID,
+    CAST(NULL AS DECIMAL(19,6)) AS DiscountAmount,
+    CAST(NULL AS DECIMAL(19,6)) AS FXDiscountAmount,
+    CAST(NULL AS CHAR(20)) AS Discount_GL_Ledger_GLLedgerID,
+    CAST(NULL AS CHAR(20)) AS Discount_TX_Main_TaxID,
+    CAST(NULL AS DECIMAL(19,6)) AS DiscountTaxAmount,
+    CAST(NULL AS DECIMAL(19,6)) AS FXDiscountTaxAmount,
+    CAST(NULL AS CHAR(20)) AS CR_Main_CreditorID,
+    CAST(NULL AS CHAR(20)) AS GL_Ledger_GLLedgerID,
+    CAST(NULL AS CHAR(20)) AS TX_Main_TaxID,
+    CAST(NULL AS DECIMAL(19,6)) AS TaxAmount,
+    CAST(NULL AS DECIMAL(19,6)) AS FXTaxAmount,
+    CAST(NULL AS CHAR(20)) AS Legacy_GL_Transactions_GLTransactionID,
+    BA_BankPaymentLineBankTransfer.BA_BankAccount_RecID AS BA_BankAccount_RecID
+FROM BA_BankPayment
+JOIN BA_BankPaymentLine ON BA_BankPayment.RecID = BA_BankPaymentLine.BA_BankPayment_RecID
+JOIN BA_BankPaymentLineBankTransfer ON BA_BankPaymentLine.RecID = BA_BankPaymentLineBankTransfer.BA_BankPaymentLine_RecID
+WHERE BA_BankPayment.BankPaymentNo = '$BankPaymentNo$'
+
+ORDER BY BA_BankPaymentLine.ItemNo
+GO
+
+SELECT
+    'Debtor' AS LineType,
+    BA_BankPaymentLine.ItemNo,
+    BA_BankPaymentLineDebtor.RecID AS DetailRecID,
+    BA_BankPaymentLineDebtor.BA_BankPaymentLine_RecID AS Detail_BA_BankPaymentLine_RecID,
+    BA_BankPaymentLineDebtor.Amount AS DetailAmount,
+    BA_BankPaymentLineDebtor.FXAmount AS DetailFXAmount,
+    BA_BankPaymentLineDebtor.DB_Main_DebtorID AS DB_Main_DebtorID,
+    CAST(NULL AS DECIMAL(19,6)) AS DiscountAmount,
+    CAST(NULL AS DECIMAL(19,6)) AS FXDiscountAmount,
+    CAST(NULL AS CHAR(20)) AS Discount_GL_Ledger_GLLedgerID,
+    CAST(NULL AS CHAR(20)) AS Discount_TX_Main_TaxID,
+    CAST(NULL AS DECIMAL(19,6)) AS DiscountTaxAmount,
+    CAST(NULL AS DECIMAL(19,6)) AS FXDiscountTaxAmount,
+    BA_BankPaymentLineDebtor.Reference AS DetailReference,
+    BA_BankPaymentLineDebtor.Remark AS DetailRemark,
+    BA_BankPaymentLineDebtor.ItemNo AS DetailItemNo,
+    BA_BankPaymentLineDebtor.Legacy_CBBatchTranLineID AS DetailLegacy_CBBatchTranLineID,
+    CAST(NULL AS CHAR(20)) AS CR_Main_CreditorID,
+    BA_BankPaymentLineDebtorAllocation.RecID AS AllocationRecID,
+    BA_BankPaymentLineDebtorAllocation.BA_BankPaymentLineDebtor_RecID AS AllocationParentRecID,
+    BA_BankPaymentLineDebtorAllocation.DB_Trans_TransID AS AllocationTransID,
+    CAST(NULL AS bit) AS AllocationType,
+    BA_BankPaymentLineDebtorAllocation.BankPaymentLineAllocationAmount AS BankPaymentLineAllocationAmount,
+    BA_BankPaymentLineDebtorAllocation.DebtorTransactionAllocationAmount AS DebtorTransactionAllocationAmount,
+    CAST(NULL AS DECIMAL(19,6)) AS CreditorTransactionAllocationAmount
+FROM BA_BankPayment
+JOIN BA_BankPaymentLine ON BA_BankPayment.RecID = BA_BankPaymentLine.BA_BankPayment_RecID
+JOIN BA_BankPaymentLineDebtor ON BA_BankPaymentLine.RecID = BA_BankPaymentLineDebtor.BA_BankPaymentLine_RecID
+JOIN BA_BankPaymentLineDebtorAllocation ON BA_BankPaymentLineDebtor.RecID = BA_BankPaymentLineDebtorAllocation.BA_BankPaymentLineDebtor_RecID
+WHERE BA_BankPayment.BankPaymentNo = '$BankPaymentNo$'
+
+UNION ALL
+
+SELECT
+    'Creditor' AS LineType,
+    BA_BankPaymentLine.ItemNo,
+    BA_BankPaymentLineCreditor.RecID AS DetailRecID,
+    BA_BankPaymentLineCreditor.BA_BankPaymentLine_RecID AS Detail_BA_BankPaymentLine_RecID,
+    BA_BankPaymentLineCreditor.Amount AS DetailAmount,
+    BA_BankPaymentLineCreditor.FXAmount AS DetailFXAmount,
+    CAST(NULL AS CHAR(20)) AS DB_Main_DebtorID,
+    CAST(NULL AS DECIMAL(19,6)) AS DiscountAmount,
+    CAST(NULL AS DECIMAL(19,6)) AS FXDiscountAmount,
+    CAST(NULL AS CHAR(20)) AS Discount_GL_Ledger_GLLedgerID,
+    CAST(NULL AS CHAR(20)) AS Discount_TX_Main_TaxID,
+    CAST(NULL AS DECIMAL(19,6)) AS DiscountTaxAmount,
+    CAST(NULL AS DECIMAL(19,6)) AS FXDiscountTaxAmount,
+    BA_BankPaymentLineCreditor.Reference AS DetailReference,
+    BA_BankPaymentLineCreditor.Remark AS DetailRemark,
+    BA_BankPaymentLineCreditor.ItemNo AS DetailItemNo,
+    BA_BankPaymentLineCreditor.Legacy_CBBatchTranLineID AS DetailLegacy_CBBatchTranLineID,
+    BA_BankPaymentLineCreditor.CR_Main_CreditorID AS CR_Main_CreditorID,
+    BA_BankPaymentLineCreditorAllocation.RecID AS AllocationRecID,
+    BA_BankPaymentLineCreditorAllocation.BA_BankPaymentLineCreditor_RecID AS AllocationParentRecID,
+    BA_BankPaymentLineCreditorAllocation.CR_Trans_TransID AS AllocationTransID,
+    BA_BankPaymentLineCreditorAllocation.AllocationType AS AllocationType,
+    BA_BankPaymentLineCreditorAllocation.BankPaymentLineAllocationAmount AS BankPaymentLineAllocationAmount,
+    CAST(NULL AS DECIMAL(19,6)) AS DebtorTransactionAllocationAmount,
+    BA_BankPaymentLineCreditorAllocation.CreditorTransactionAllocationAmount AS CreditorTransactionAllocationAmount
+FROM BA_BankPayment
+JOIN BA_BankPaymentLine ON BA_BankPayment.RecID = BA_BankPaymentLine.BA_BankPayment_RecID
+JOIN BA_BankPaymentLineCreditor ON BA_BankPaymentLine.RecID = BA_BankPaymentLineCreditor.BA_BankPaymentLine_RecID
+JOIN BA_BankPaymentLineCreditorAllocation ON BA_BankPaymentLineCreditor.RecID = BA_BankPaymentLineCreditorAllocation.BA_BankPaymentLineCreditor_RecID
+WHERE BA_BankPayment.BankPaymentNo = '$BankPaymentNo$'
+
+ORDER BY ItemNo, LineType, AllocationRecID
+GO
+]]>
+		</Code>
+	</Snippet>
+	</CodeSnippet>
+</CodeSnippets>
+
